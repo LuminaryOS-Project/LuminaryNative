@@ -7,6 +7,7 @@ struct Point {
     int x;
     int y;
 };
+
 class NativeRef {
     private:
         jobject obj;
@@ -19,6 +20,12 @@ class NativeRef {
         ~NativeRef() {}
         jobject getObject() { return this->obj; }
         jclass getClass() { return this->clazz; }
+};
 
+enum State {
+    STATE_IDLE,
+    STATE_RUNNING,
+    STATE_PAUSED,
+    STATE_STOPPED
 };
 #endif
