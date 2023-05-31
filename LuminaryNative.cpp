@@ -12,22 +12,22 @@ __m128 load(float value) {
 
 const char * get_version() {
     #ifdef _WIN64
-    return "Luminary Native (Windows 64-bit)";
+    return "Luminary Native (Windows 64-bit / v1.0.0)";
     #elif _WIN32
-    return "Luminary Native (Windows 32-bit)";
+    return "Luminary Native (Windows 32-bit / v1.0.0)";
     #elif __APPLE__ || __MACH__
-    return "Luminary Native (Mac OSX)";
+    return "Luminary Native (Mac OSX / v1.0.0)";
     #elif __linux__
-    return "Luminary Native (Linux)";
+    return "Luminary Native (Linux / v1.0.0)";
     #elif __unix || __unix__
-    return "Luminary Native (Unix)";
+    return "Luminary Native (Unix / v1.0.0)";
     #else
-    return "Luminary Native (Other) *(THIS SHOULD NEVER HAPPEN IN PRODUCTION)";
+    return "Luminary Native (Other / v1.0.0) *(THIS SHOULD NEVER HAPPEN IN PRODUCTION)";
     #endif
 };
 
 JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_getInfo(JNIEnv* env, jobject thisObject) {
-    jstring result =  env->NewStringUTF("Luminary Native (Windows 1.0)");
+    jstring result =  env->NewStringUTF(get_version());
     return result;
 }
 /*
