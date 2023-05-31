@@ -33,7 +33,9 @@ JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_getInfo(JNIEnv* env, 
 /*
 Optimised for rendering Java ASCII surfaces.
 */
+/* #if defined(i386) || defined(__i386__) || defined(__i386)
 
+#endif */
 JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateX(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
     __m128 sinA = load(sin(A));
     __m128 sinB = load(sin(B));
