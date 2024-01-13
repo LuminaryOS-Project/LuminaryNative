@@ -16,6 +16,21 @@ JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_getInfo
   (JNIEnv *, jobject);
 
 /*
+ * Class:     Native
+ * Method:    blacklistMethods
+ * Signature: (Ljava/lang/Class;Ljava/util/Set;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_blacklistMethods
+  (JNIEnv *, jobject, jclass, jobject);
+/*
+ * Class:     Native
+ * Method:    blacklistMethods
+ * Signature: (Ljava/lang/Class;Ljava/util/Set;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_blacklistFields
+  (JNIEnv *, jobject, jclass, jobject);
+
+/*
  * Class:     com_luminary_os_core_Native
  * Method:    calculateX
  * Signature: (III)F

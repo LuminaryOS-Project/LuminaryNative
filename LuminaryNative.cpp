@@ -3,12 +3,8 @@
 #include "Luminary.h"
 #include "LuminaryNative.h"
 #include "cmath"
-#include <immintrin.h>
 #include <string>
 
-__m128 load(float value) {
-    return _mm_set1_ps(value);
-}
 
 const char * get_version() {
     #ifdef _WIN64
@@ -36,76 +32,51 @@ Optimised for rendering Java ASCII surfaces.
 /* #if defined(i386) || defined(__i386__) || defined(__i386)
 
 #endif */
-JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateX(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
-    __m128 sinA = load(sin(A));
-    __m128 sinB = load(sin(B));
-    __m128 cosC = load(cos(C));
-    __m128 cosA = load(cos(A));
-    __m128 sinC = load(sin(C));
-    __m128 cosB = load(cos(B));
+JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_blacklistMethods(JNIEnv* env, jobject thisObject, jclass clazz, jobject blacklisted) {
+    jclass reflClass = env->FindClass("jdk/internal/reflect/Reflection");
+    if (reflClass == nullptr) {
+        return env->NewStringUTF("CLASS_NOT_FOUND(NULLPTR)");
+    }
 
-    __m128 jVec = _mm_set1_ps(static_cast<float>(j));
-    __m128 kVec = _mm_set1_ps(static_cast<float>(k));
-    __m128 iVec = _mm_set1_ps(static_cast<float>(i));
+    jmethodID rmtfmid = env->GetStaticMethodID(reflClass, "registerMethodsToFilter", "(Ljava/lang/Class;Ljava/util/Set;)V");
+    if (rmtfmid == nullptr) {
+        return env->NewStringUTF("METHOD_NOT_FOUND(NULLPTR)");
+    }
+    
+    env->CallStaticVoidMethod(reflClass, rmtfmid, clazz, blacklisted);
 
-    __m128 result = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(jVec, sinA), sinB), cosC),
-                               _mm_add_ps(_mm_add_ps(_mm_mul_ps(_mm_mul_ps(kVec, cosA), sinB), _mm_mul_ps(jVec, cosA)), _mm_add_ps(_mm_mul_ps(kVec, sinA), _mm_mul_ps(iVec, cosB))));
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return env->NewStringUTF("EXCEPTION");
+    }
 
-    float x;
-    _mm_store_ss(&x, result);
-
-    return x;
+    return env->NewStringUTF("SUCCESS");
 }
-JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateY(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
-    __m128 cosA = _mm_set1_ps(std::cos(A));
-    __m128 cosB = _mm_set1_ps(std::cos(B));
-    __m128 cosC = _mm_set1_ps(std::cos(C));
-    __m128 sinA = _mm_set1_ps(std::sin(A));
-    __m128 sinB = _mm_set1_ps(std::sin(B));
-    __m128 sinC = _mm_set1_ps(std::sin(C));
 
-    __m128 jValues = _mm_set1_ps(static_cast<float>(j));
-    __m128 kValues = _mm_set1_ps(static_cast<float>(k));
-    __m128 iValues = _mm_set1_ps(static_cast<float>(i));
+JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_blacklistFields(JNIEnv* env, jobject thisObject, jclass clazz, jobject blacklisted) {
+    jclass reflClass = env->FindClass("jdk/internal/reflect/Reflection");
+    if (reflClass == nullptr) {
+        return env->NewStringUTF("CLASS_NOT_FOUND(NULLPTR)");
+    }
 
-    __m128 term1 = _mm_mul_ps(jValues, _mm_mul_ps(cosA, cosC));
-    __m128 term2 = _mm_mul_ps(kValues, _mm_mul_ps(sinA, cosC));
-    __m128 term3 = _mm_mul_ps(jValues, _mm_mul_ps(sinA, _mm_mul_ps(sinB, sinC)));
-    __m128 term4 = _mm_mul_ps(kValues, _mm_mul_ps(cosA, _mm_mul_ps(sinB, sinC)));
-    __m128 term5 = _mm_mul_ps(iValues, _mm_mul_ps(cosB, sinC));
+    jmethodID rftfmid = env->GetStaticMethodID(reflClass, "registerFieldsToFilter", "(Ljava/lang/Class;Ljava/util/Set;)V");
+    if (rftfmid == nullptr) {
+        return env->NewStringUTF("METHOD_NOT_FOUND(NULLPTR)");
+    }
+    
+    env->CallStaticVoidMethod(reflClass, rftfmid, clazz, blacklisted);
 
-    __m128 result = _mm_sub_ps(_mm_add_ps(_mm_sub_ps(_mm_add_ps(term1, term2), term3), term4), term5);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return env->NewStringUTF("EXCEPTION");
+    }
 
-    alignas(16) float resultArray[4];
-    _mm_store_ps(resultArray, result);
+    return env->NewStringUTF("SUCCESS");
+}
 
-    return resultArray[0];
-};
-
-JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateZ(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
-    __m128 cosA = _mm_set1_ps(std::cos(A));
-    __m128 cosB = _mm_set1_ps(std::cos(B));
-    __m128 sinA = _mm_set1_ps(std::sin(A));
-    __m128 sinB = _mm_set1_ps(std::sin(B));
-
-    __m128 jValues = _mm_set1_ps(static_cast<float>(j));
-    __m128 kValues = _mm_set1_ps(static_cast<float>(k));
-    __m128 iValues = _mm_set1_ps(static_cast<float>(i));
-
-    __m128 term1 = _mm_mul_ps(kValues, _mm_mul_ps(cosA, cosB));
-    __m128 term2 = _mm_mul_ps(jValues, _mm_mul_ps(sinA, cosB));
-    __m128 term3 = _mm_mul_ps(iValues, sinB);
-
-    __m128 result = _mm_add_ps(_mm_sub_ps(term1, term2), term3);
-
-    alignas(16) float resultArray[4];
-    _mm_store_ps(resultArray, result);
-
-    return resultArray[0];
-};
-
-
-/*JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateX(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
+JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateX(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
     return j * sin(A) * sin(B) * cos(C) - k * cos(A) * sin(B) * cos(C) + j * cos(A) * sin(C) + k * sin(A) * sin(C) + i * cos(B) * cos(C);
 }
 
@@ -115,4 +86,4 @@ JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateY(JNIEnv* env
 
 JNIEXPORT jfloat JNICALL Java_com_luminary_os_core_Native_calculateZ(JNIEnv* env, jobject thisObject, jint i, jint j, jint k, jfloat A, jfloat B, jfloat C) {
     return k * cos(A) * cos(B) - j * sin(A) * cos(B) + i * sin(B);
-}*/
+}
