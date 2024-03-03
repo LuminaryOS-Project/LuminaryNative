@@ -29,11 +29,10 @@ JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_getInfo(JNIEnv* env, 
 /*
 Optimised for rendering Java ASCII surfaces.
 */
-/* #if defined(i386) || defined(__i386__) || defined(__i386)
 
-#endif */
 JNIEXPORT jstring JNICALL Java_com_luminary_os_core_Native_blacklistMethods(JNIEnv* env, jobject thisObject, jclass clazz, jobject blacklisted) {
     jclass reflClass = env->FindClass("jdk/internal/reflect/Reflection");
+
     if (reflClass == nullptr) {
         return env->NewStringUTF("CLASS_NOT_FOUND(NULLPTR)");
     }
